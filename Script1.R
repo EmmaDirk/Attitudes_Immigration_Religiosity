@@ -30,23 +30,18 @@ for (i in 1:3) {                                                                
   for (j in (i + 1):4) {
     mode1 <- i
     mode2 <- j
-    
     mode1_data <- compsub[compsub$mode == mode1, variables]
     mode2_data <- compsub[compsub$mode == mode2, variables]
-    
     if (nrow(mode1_data) > 1 && nrow(mode2_data) > 1) {
       test_results <- lapply(variables, function(var) {
         wilcox.test(mode1_data[[var]], mode2_data[[var]])
       })
-      
       p_values <- sapply(test_results, function(test) {
         test$p.value
       })
-      
       test_results_df <- data.frame(Variable = variables, P_Value = p_values)
       test_results_df$Mode1 <- mode1
       test_results_df$Mode2 <- mode2
-      
       wilcox_results[[length(wilcox_results) + 1]] <- test_results_df
     }
   }
@@ -261,14 +256,15 @@ asy_long <- asy_clean %>%
 aggregated_df <- aggregated_df %>%
   left_join(asy_long, by = c("year_month" = "year_month"))
 
-months_to_keep <- c("2020-09", "2020-10", "2021-05", "2021-06", "2021-07", "2021-08",   #Removing unnecessary data
+months_to_keep <- c("2020-09", "2020-10", "2021-05", "2021-06", "2021-07", "2021-08",   
                     "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", 
-                    "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09")
+                    "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", 
+                    "2022-09")                                                         
 country_codes <- c("Belgium", "Bulgaria", "Switzerland", "Czechia", "Estonia", "Finland", 
                    "France", "United Kingdom", "Greece", "Croatia", "Hungary", "Ireland", 
                    "Iceland", "Italy", "Lithuania", "Montenegro", "North Macedonia", 
                    "Netherlands", "Norway", "Portugal", "Slovenia", "Slovakia") 
-cov_filtered <- cov %>%
+cov_filtered <- cov %>%                                                         #Removing unnecessary data
   filter(location %in% country_codes) %>%
   select(location, date, new_cases, new_deaths)
 cov_filtered <- cov_filtered %>%
@@ -286,7 +282,8 @@ merged_df <- left_join(aggregated_df, aggregated1_df, by = "year_month")        
 
 write.csv(merged_df, "agg_df.csv", row.names = FALSE)                           #Exporting to create figures in Tableau
 
-df$recoded_month <- as.integer(factor(df$year_month, levels = unique(df$year_month)))
+df$recoded_month <- as.integer(factor(df$year_month, levels = 
+                                      unique(df$year_month)))
 df <- df %>%
   mutate(
     recoded_month = case_when(
